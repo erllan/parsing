@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Parser!</h1>
+<div>
+<textarea cols="60" rows="10">
+
+    {{result}}-{{status}}
+
+</textarea>
+<textarea cols="60" rows="10">
+
+    {%for u in url%}
+    {%for result_url in u.resulturl_set.all%}
+    {{result_url.title}}{{result_url.h1}}
+    {%endfor%}
+    {%endfor%}
+
+</textarea>
+</div>
+
+</body>
+</html>
