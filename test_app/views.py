@@ -1,25 +1,29 @@
 from django.shortcuts import render
-from .models import Url, ResultUrl
-from .parser import parser_html, requests_parser
+from .models import Url
+from .parser import requests_parser
 from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializer import UrlSerializer
+import threading
+from time import sleep
 
 
 def index(request):
-    URLS = Url.objects.all()
-    result = ''
-    status = ''
-    for url in URLS:
-        html = requests_parser(url.url)
-        if html.status_code == 200:
-            status = html.status_code
-            title = parser_html(html.text, 'title')
-            h1 = parser_html(html.text, 'h1')
-            result = timezone.datetime.now()
-            ResultUrl.objects.create(url=url,
-                                     title=title,
-                                     h1=h1
-                                     )
-        else:
-            status = html.status_code
+    url = Url.objects.all()
+    return render(request, 'test_app/index.html', {'url': url})
 
-    return render(request, 'test_app/index.html', {'result': result, 'status': status, 'url': URLS})
+
+class ParserSite(APIView):
+    def get(self, request):
+        URLS = Url.objects.all()
+        urls = UrlSerializer(URLS, many=True, read_only=True)
+        result = ''
+        date = []
+        for url in URLS:
+            time = (url.minut * 60) + url.sec
+            sleep(time)
+            date.append(timezone.datetime.now())
+            t = threading.Thread(target=requests_parser, args=(url,))
+            t.start()
+        return Response({'result': result, 'date': date, 'url': urls.data})
