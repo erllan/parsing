@@ -1,3 +1,16 @@
-from django.test import TestCase
+import threading
 
-# Create your tests here.
+x = 'eqw'
+
+
+def test(arg):
+    global x
+    x = arg
+    print(x)
+
+
+t = threading.Thread(target=test, args='r')
+t1 = threading.Thread(target=test, args='e')
+t1.start()
+t.start()
+
